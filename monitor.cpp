@@ -80,7 +80,6 @@ struct browsers_data
 };
  
 
-
 browsers_data browser_search(){
     browsers_data total;
     DIR* dir = opendir("/proc");
@@ -92,11 +91,15 @@ browsers_data browser_search(){
             ifstream in( entrada_str + "cmdline");
             string line;
             getline(in, line);
-            for (unsigned char i = 0; i < 4; i++){
+            for (unsigned char i = 0; i < 8; i++){
                 if (line.find(total.nomes[i]) != string::npos){
-                    ifstream in2(entrada_str + "status");
+                    ifstream in2(entrada_str + "smaps_rollup");
+                    // getline(in2, line);
+                    // getline(in2, line);
+                    // getline(in2, line);
+                    // total.ram[i] += extrair_dados_string_int(procurar_numeros(line));
                     while (getline(in2, line)){
-                        if (line.find("VmRSS:") != string::npos) {
+                        if (line.find("Pss:") != string::npos) {
                             total.ram[i] += extrair_dados_string_int(procurar_numeros(line));
                             break;}
                     }
@@ -117,7 +120,7 @@ int main(){
         cpu current_cpu = cpu_usage();
         printf("cpu usage: %.4g %% \n", (current_cpu.work - last_cpu.work) * 100.0 / (current_cpu.total - last_cpu.total));
         browsers_data browsers = browser_search();
-        for (unsigned char i = 0;i < 4; i++){
+        for (unsigned char i = 0;i < 8; i++){
             if (browsers.ram[i] > 10000){
                 printf("Ram %s: %.4g Gb\n",browsers.nomes[i].c_str(), browsers.ram[i] / 1048576);
             }
