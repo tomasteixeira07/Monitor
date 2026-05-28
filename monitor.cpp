@@ -118,7 +118,7 @@ int main(){
         printf("cpu usage: %.4g %% \n", (current_cpu.work - last_cpu.work) * 100.0 / (current_cpu.total - last_cpu.total));
         browsers_data browsers = browser_search();
         for (unsigned char i = 0;i < 4; i++){
-            if (browsers.ram[i]!=0){
+            if (browsers.ram[i] > 10000){
                 printf("Ram %s: %.4g Gb\n",browsers.nomes[i].c_str(), browsers.ram[i] / 1048576);
             }
         }
