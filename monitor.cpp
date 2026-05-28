@@ -75,8 +75,8 @@ cpu cpu_usage(){
 
 
 struct browsers_data
-{   const string nomes[4] = {"firefox", "chrome", "chromium", "brave"};
-    double ram[4] ={0,0,0,0};
+{   const string nomes[8] = {"firefox", "chrome", "chromium", "brave", "vivaldi", "edge", "librewolf", "zen"};
+    double ram[8] ={0,0,0,0,0,0,0,0};
 };
  
 
