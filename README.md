@@ -136,10 +136,6 @@ Remove o binário compilado.
 ## Futuras Melhorias (v2.0)
 
 - Interface interativa com `ncurses`
-- CPU por browser
-- Monitorização de disco
-- Histórico de dados
-- Gráficos ASCII
 
 ## Versão
 
