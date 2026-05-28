@@ -2,6 +2,11 @@
 #include <fstream>
 #include <string>
 #include <unistd.h>
+//#include <filesystem>
+#include <dirent.h>
+
+//#include <unistd.h>  //para ler o tamanho das paginas para o browser    
+
 
 
 using namespace std;
@@ -76,15 +81,55 @@ cpu cpu_usage(){
 }
 
 
+struct browsers_data
+{   const string nomes[4] = {"firefox", "chrome", "chromium", "brave"};
+    unsigned long int ram[4] ={0,0,0,0};
+};
+ 
+
+
+browsers_data browser_search(){
+    browsers_data total;
+    DIR* dir = opendir("/proc");
+    struct dirent* entrada;
+    while ((entrada = readdir(dir)) != NULL){
+        if (procurar_numeros(entrada->d_name) != ""){
+            string entrada_str = entrada->d_name;
+            entrada_str = "/proc/" + entrada_str + '/';
+            ifstream in( entrada_str + "cmdline");
+            string line;
+            getline(in, line);
+            for (unsigned char i = 0; i < 4; i++){
+                if (line.find(total.nomes[i]) != string::npos){
+                    ifstream in2(entrada_str + "status");
+                    while (getline(in2, line)){
+                        if (line.find("VmRSS:") != string::npos) {
+                            total.ram[i] += extrair_dados_string_int(procurar_numeros(line));
+                            break;}
+                    }
+                }
+            }
+        }
+    }
+    closedir(dir);
+    return total;
+}
+
+
 int main(){
     cpu last_cpu = cpu_usage();
     while (true){
         tot_use_ava storage = global_memory();
         printf("Total: %.4g Gb  Available: %.4g Gb  Used: %.4g Gb\n", storage.total, storage.available, storage.used);
-        //cout << "Total: " << storage.total << " Gb  Available: " << storage.available << " Gb  Used: " << storage.used << " Gb\n"; 
         cpu current_cpu = cpu_usage();
-        printf("cpu usage: %.4g %% \n\n", (current_cpu.work - last_cpu.work) * 100.0 / (current_cpu.total - last_cpu.total));
-        //cout << "cpu usage: " << (current_cpu.work - last_cpu.work) * 100.0 / (current_cpu.total - last_cpu.total) << " %\n\n";
+        printf("cpu usage: %.4g %% \n", (current_cpu.work - last_cpu.work) * 100.0 / (current_cpu.total - last_cpu.total));
+        browsers_data browsers = browser_search();
+        for (unsigned char i = 0;i < 4; i++){
+            if (browsers.ram[i]!=0){
+                printf("Ram %s: %lu Mb\n",browsers.nomes[i].c_str(), browsers.ram[i] / 1024);
+            }
+        }
+        printf("\n\n");
         sleep(1);
         last_cpu = current_cpu;
     }
