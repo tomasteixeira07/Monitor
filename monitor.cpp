@@ -2,11 +2,7 @@
 #include <fstream>
 #include <string>
 #include <unistd.h>
-//#include <filesystem>
 #include <dirent.h>
-
-//#include <unistd.h>  //para ler o tamanho das paginas para o browser    
-
 
 
 using namespace std;
@@ -22,7 +18,6 @@ struct tot_use_ava{
 unsigned long int  extrair_dados_string_int(const string texto){
     unsigned long int resultado = 0;
     for (unsigned short i = 0; i < texto.length(); i++){
-        //std::cout << texto[i] << '\n';
         resultado = resultado * 10 + (texto[i] - 48 );
     }
     return resultado;
