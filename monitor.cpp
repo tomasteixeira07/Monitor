@@ -64,13 +64,11 @@ cpu cpu_usage(){
     unsigned char contagem_somas = 0;
     while (contagem < line.length()){
         unsigned short fim = line.length() - 1;
-        //cout << line.find(' ', contagem) << '\n';
         if (line.find(' ', contagem) != string::npos){fim = line.find(' ', contagem);}
         unsigned long int novo = extrair_dados_string_int(line.substr(contagem, fim - contagem));
         total += novo;
         if (contagem_somas < 3){work += novo; contagem_somas++;}
         contagem = fim + 1;
-        //cout<< contagem<<'\n';
     }
     return {total, work};
 }
@@ -78,7 +76,7 @@ cpu cpu_usage(){
 
 struct browsers_data
 {   const string nomes[4] = {"firefox", "chrome", "chromium", "brave"};
-    unsigned long int ram[4] ={0,0,0,0};
+    double ram[4] ={0,0,0,0};
 };
  
 
@@ -121,7 +119,7 @@ int main(){
         browsers_data browsers = browser_search();
         for (unsigned char i = 0;i < 4; i++){
             if (browsers.ram[i]!=0){
-                printf("Ram %s: %lu Mb\n",browsers.nomes[i].c_str(), browsers.ram[i] / 1024);
+                printf("Ram %s: %.4g Gb\n",browsers.nomes[i].c_str(), browsers.ram[i] / 1048576);
             }
         }
         printf("\n\n");
