@@ -85,7 +85,7 @@ browsers_data browser_search(){
     DIR* dir = opendir("/proc");
     struct dirent* entrada;
     while ((entrada = readdir(dir)) != NULL){
-        if (procurar_numeros(entrada->d_name) != ""){
+        if (entrada->d_name[0] >= '0' and entrada->d_name[0] <= '9'){
             string entrada_str = entrada->d_name;
             entrada_str = "/proc/" + entrada_str + '/';
             ifstream in( entrada_str + "cmdline");
@@ -94,15 +94,15 @@ browsers_data browser_search(){
             for (unsigned char i = 0; i < 8; i++){
                 if (line.find(total.nomes[i]) != string::npos){
                     ifstream in2(entrada_str + "smaps_rollup");
-                    // getline(in2, line);
-                    // getline(in2, line);
-                    // getline(in2, line);
-                    // total.ram[i] += extrair_dados_string_int(procurar_numeros(line));
-                    while (getline(in2, line)){
-                        if (line.find("Pss:") != string::npos) {
-                            total.ram[i] += extrair_dados_string_int(procurar_numeros(line));
-                            break;}
-                    }
+                    getline(in2, line);
+                    getline(in2, line);
+                    getline(in2, line);
+                    total.ram[i] += extrair_dados_string_int(procurar_numeros(line));
+                    // while (getline(in2, line)){
+                    //     if (line.find("Pss:") != string::npos) {
+                    //         total.ram[i] += extrair_dados_string_int(procurar_numeros(line));
+                    //         break;}
+                    // }
                 }
             }
         }
