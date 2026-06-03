@@ -3,6 +3,7 @@
 #include <string>
 #include <unistd.h>
 #include <dirent.h>
+#include <ncurses.h>
 
 
 using namespace std;
@@ -113,21 +114,29 @@ browsers_data browser_search(){
 
 
 int main(){
+    initscr();
+    int max_y, max_x;
+    box(stdscr, 0, 0);
     cpu last_cpu = cpu_usage();
+    getmaxyx(stdscr, max_y, max_x);
+    box(stdscr, 0, 0);
+    getmaxyx(stdscr, max_y, max_x);
     while (true){
+        clear();
         tot_use_ava storage = global_memory();
-        printf("Total: %.4g Gb  Available: %.4g Gb  Used: %.4g Gb\n", storage.total, storage.available, storage.used);
+        mvprintw(1,2,"Total: %.4g Gb  Available: %.4g Gb  Used: %.4g Gb", storage.total, storage.available, storage.used);
         cpu current_cpu = cpu_usage();
-        printf("cpu usage: %.4g %% \n", (current_cpu.work - last_cpu.work) * 100.0 / (current_cpu.total - last_cpu.total));
+        mvprintw(2,2,"cpu usage: %.4g %% ", (current_cpu.work - last_cpu.work) * 100.0 / (current_cpu.total - last_cpu.total));
         browsers_data browsers = browser_search();
         for (unsigned char i = 0;i < 8; i++){
             if (browsers.ram[i] > 10000){
-                printf("Ram %s: %.4g Gb\n",browsers.nomes[i].c_str(), browsers.ram[i] / 1048576);
+                mvprintw(3,2,"Ram %s: %.4g Gb",browsers.nomes[i].c_str(), browsers.ram[i] / 1048576);
             }
         }
-        printf("\n\n");
+        refresh();
         sleep(1);
         last_cpu = current_cpu;
     }
+    endwin();
     return 0;
 }

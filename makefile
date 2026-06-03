@@ -1,5 +1,5 @@
 monitor: monitor.cpp
-	g++ -O3 -static monitor.cpp -o monitor
+	g++ -O3 monitor.cpp -o monitor -lncurses
 	strip -s monitor
 
 clean:
