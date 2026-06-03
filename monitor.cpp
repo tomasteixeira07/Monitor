@@ -35,17 +35,14 @@ string procurar_numeros(const string texto){
 }
 
 
-tot_use_ava global_memory (){
-    tot_use_ava storage;
+void global_memory (tot_use_ava &storage){
     ifstream in("/proc/meminfo");
     string line;
     getline(in, line);
-    storage.total = extrair_dados_string_int(procurar_numeros(line)) / 1048576.0;
     getline(in, line);
     getline(in,line);
     storage.available = extrair_dados_string_int(procurar_numeros(line)) / 1048576.0;
-    storage.used = storage.total - storage.available;
-    return storage; 
+    storage.used = storage.total - storage.available; 
 } 
 
 
@@ -114,6 +111,13 @@ browsers_data browser_search(){
 
 
 int main(){
+    tot_use_ava storage;
+    ifstream in("/proc/meminfo");
+    string line;
+    getline(in, line);
+    storage.total = extrair_dados_string_int(procurar_numeros(line)) / 1048576.0;
+    in.close();
+    line.clear();
     initscr();
     int max_y, max_x;
     box(stdscr, 0, 0);
@@ -123,7 +127,7 @@ int main(){
     getmaxyx(stdscr, max_y, max_x);
     while (true){
         clear();
-        tot_use_ava storage = global_memory();
+        global_memory(storage);
         mvprintw(1,2,"Total: %.4g Gb  Available: %.4g Gb  Used: %.4g Gb", storage.total, storage.available, storage.used);
         cpu current_cpu = cpu_usage();
         mvprintw(2,2,"cpu usage: %.4g %% ", (current_cpu.work - last_cpu.work) * 100.0 / (current_cpu.total - last_cpu.total));
