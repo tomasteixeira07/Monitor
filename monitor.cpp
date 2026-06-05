@@ -6,6 +6,8 @@
 #include <ncurses.h>
 #include <vector>
 #include <unordered_set>
+#include <csignal>
+
 
 
 using namespace std;
@@ -74,7 +76,7 @@ cpu cpu_usage(){
 }
  
 
-void browser_search(const vector<string>& nomes, vector <double> &storage, unordered_set<int> &PIDS_Lixo, unordered_set<int> &UTEIS){
+void browser_search(const vector<string>& nomes, vector <double> &storage, unordered_set<int> &PIDS_Lixo){
     
     DIR* dir = opendir("/proc");
     struct dirent* entrada;
@@ -101,6 +103,7 @@ void browser_search(const vector<string>& nomes, vector <double> &storage, unord
                         //         break;}
                         // }
                         found = 1;
+                        break;
                     }
                 }
                 if (found == 0){PIDS_Lixo.insert(PID);}
@@ -138,8 +141,8 @@ int main(){
         else{nomes_a_procurar.push_back(nomes[x - 48]);}
     }
 
-
     initscr();
+    nodelay(stdscr, TRUE);
     int max_y, max_x;
     box(stdscr, 0, 0);
     cpu last_cpu = cpu_usage();
@@ -148,7 +151,8 @@ int main(){
     getmaxyx(stdscr, max_y, max_x);
     vector <double> browsers_ram(nomes_a_procurar.size());
     unordered_set <int> PIDS_Lixo;
-    unordered_set <int> PIDS_UTEIS;
+    unsigned short contagem = 0;
+    sleep(1);
     while (true){
         clear();
 
@@ -156,7 +160,7 @@ int main(){
         global_memory(storage);
         mvprintw(1,2,"Memory");
         mvprintw(2,4,"Total     : %8.2f GB", storage.total);
-        mvprintw(3,4,"Available : %8.2f GB", storage.available);
+        mvprintw(3,4,"Available : %8.2f GB              Press 'q' to leave", storage.available);
         mvprintw(4,4,"Used      : %8.2f GB", storage.used);
         
 
@@ -182,9 +186,16 @@ int main(){
             //}
         }
         refresh();
+        int ch = getch();
+        if (ch == 'q' || ch == 'Q') {
+            endwin();
+            exit(0);
+        }
+
+
         sleep(1);
         last_cpu = current_cpu;
+        contagem++;
+        if (contagem == 30) {PIDS_Lixo.clear(), contagem = 0;};
     }
-    endwin();
-    return 0;
 }
