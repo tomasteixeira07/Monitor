@@ -76,7 +76,7 @@ cpu cpu_usage(){
 }
  
 
-void browser_search(const vector<string>& nomes, vector <double> &storage, unordered_set<int> &PIDS_Lixo){
+void browser_search(const vector<string>& nomes, vector <double> &storage, unordered_set<unsigned int> &PIDS_Lixo){
     
     DIR* dir = opendir("/proc");
     struct dirent* entrada;
@@ -150,7 +150,7 @@ int main(){
     box(stdscr, 0, 0);
     getmaxyx(stdscr, max_y, max_x);
     vector <double> browsers_ram(nomes_a_procurar.size());
-    unordered_set <int> PIDS_Lixo;
+    unordered_set <unsigned int> PIDS_Lixo;
     unsigned short contagem = 0;
     sleep(1);
     while (true){
