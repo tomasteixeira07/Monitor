@@ -1,9 +1,11 @@
-//#include <iostream>
+#include <iostream>
 #include <fstream>
 #include <string>
 #include <unistd.h>
 #include <dirent.h>
 #include <ncurses.h>
+#include <vector>
+#include <unordered_set>
 
 
 using namespace std;
@@ -70,44 +72,44 @@ cpu cpu_usage(){
     }
     return {total, work};
 }
-
-
-struct browsers_data
-{   const string nomes[8] = {"firefox", "chrome", "chromium", "brave", "vivaldi", "edge", "librewolf", "zen"};
-    double ram[8] ={0,0,0,0,0,0,0,0};
-};
  
 
-browsers_data browser_search(){
-    browsers_data total;
+void browser_search(const vector<string>& nomes, vector <double> &storage, unordered_set<int> &PIDS_Lixo, unordered_set<int> &UTEIS){
+    
     DIR* dir = opendir("/proc");
     struct dirent* entrada;
     while ((entrada = readdir(dir)) != NULL){
         if (entrada->d_name[0] >= '0' and entrada->d_name[0] <= '9'){
             string entrada_str = entrada->d_name;
-            entrada_str = "/proc/" + entrada_str + '/';
-            ifstream in( entrada_str + "cmdline");
-            string line;
-            getline(in, line);
-            for (unsigned char i = 0; i < 8; i++){
-                if (line.find(total.nomes[i]) != string::npos){
-                    ifstream in2(entrada_str + "smaps_rollup");
-                    getline(in2, line);
-                    getline(in2, line);
-                    getline(in2, line);
-                    total.ram[i] += extrair_dados_string_int(procurar_numeros(line));
-                    // while (getline(in2, line)){
-                    //     if (line.find("Pss:") != string::npos) {
-                    //         total.ram[i] += extrair_dados_string_int(procurar_numeros(line));
-                    //         break;}
-                    // }
+            unsigned long int PID = extrair_dados_string_int(entrada_str);
+            if (PIDS_Lixo.find(PID) == PIDS_Lixo.end()){
+                entrada_str = "/proc/" + entrada_str + '/';
+                ifstream in( entrada_str + "cgroup");
+                string line;
+                getline(in, line);
+                bool found = 0;
+                for (unsigned short i = 0; i < nomes.size(); i++){
+                    if (line.find(nomes[i]) != string::npos){
+                        ifstream in2(entrada_str + "smaps_rollup");
+                        getline(in2, line);
+                        getline(in2, line);
+                        getline(in2, line);
+                        storage[i] += extrair_dados_string_int(procurar_numeros(line));
+                        // while (getline(in2, line)){
+                        //     if (line.find("Pss:") != string::npos) {
+                        //         total.ram[i] += extrair_dados_string_int(procurar_numeros(line));
+                        //         break;}
+                        // }
+                        found = 1;
+                    }
                 }
+                if (found == 0){PIDS_Lixo.insert(PID);}
             }
         }
     }
     closedir(dir);
-    return total;
 }
+
 
 
 int main(){
@@ -118,6 +120,25 @@ int main(){
     storage.total = extrair_dados_string_int(procurar_numeros(line)) / 1048576.0;
     in.close();
     line.clear();
+    
+    //const string* nomes = new string[8]{"firefox", "chrome", "chromium", "brave", "vivaldi", "edge", "librewolf", "zen"};
+    const string nomes[8] = {"firefox", "chrome", "chromium", "brave", "vivaldi", "edge", "librewolf", "zen"};
+    printf("Browsers disponiveis:\n");
+    for (unsigned short i = 0; i < 8; i++){
+        printf("%d. %s\n", i, nomes[i].c_str());
+    }
+    printf("Introduza os numeros dos browsers que deseja:\n");
+    vector<string> nomes_a_procurar;
+    while (true){
+        char x;
+        printf("Número(introduza . se desejar acabar):");
+        cin >> x;
+        if (x == '.'){break;}
+        if (x < '0' or x > '7'){printf("Valor Inválido!\n");}
+        else{nomes_a_procurar.push_back(nomes[x - 48]);}
+    }
+
+
     initscr();
     int max_y, max_x;
     box(stdscr, 0, 0);
@@ -125,17 +146,40 @@ int main(){
     getmaxyx(stdscr, max_y, max_x);
     box(stdscr, 0, 0);
     getmaxyx(stdscr, max_y, max_x);
+    vector <double> browsers_ram(nomes_a_procurar.size());
+    unordered_set <int> PIDS_Lixo;
+    unordered_set <int> PIDS_UTEIS;
     while (true){
         clear();
+
+
         global_memory(storage);
-        mvprintw(1,2,"Total: %.4g Gb  Available: %.4g Gb  Used: %.4g Gb", storage.total, storage.available, storage.used);
+        mvprintw(1,2,"Memory");
+        mvprintw(2,4,"Total     : %8.2f GB", storage.total);
+        mvprintw(3,4,"Available : %8.2f GB", storage.available);
+        mvprintw(4,4,"Used      : %8.2f GB", storage.used);
+        
+
+        mvprintw(6,2,"CPU");
         cpu current_cpu = cpu_usage();
-        mvprintw(2,2,"cpu usage: %.4g %% ", (current_cpu.work - last_cpu.work) * 100.0 / (current_cpu.total - last_cpu.total));
-        browsers_data browsers = browser_search();
-        for (unsigned char i = 0;i < 8; i++){
-            if (browsers.ram[i] > 10000){
-                mvprintw(3,2,"Ram %s: %.4g Gb",browsers.nomes[i].c_str(), browsers.ram[i] / 1048576);
-            }
+        double cpu_percent = (current_cpu.work - last_cpu.work) * 100.0 / (current_cpu.total - last_cpu.total);
+        mvprintw(7,4,"CPU Usage: %6.2f%%", (cpu_percent));
+        mvaddch(8,4,'[');
+        int preenchimento = cpu_percent * 0.5;
+        for (int i = 0; i < 50; i++) {
+            mvaddch(8,5+i, i < preenchimento ? '#' : ' ');
+        }
+        mvaddch(8,5+50,']');
+
+
+        mvprintw(10,2,"Memory Browsers");
+        browsers_ram.resize(nomes_a_procurar.size());
+        browser_search(nomes_a_procurar, browsers_ram, PIDS_Lixo);
+        for (unsigned short i = 0;i < nomes_a_procurar.size(); i++){
+            //if (browsers_ram[i] > 10000){
+                mvprintw(11 + i,4,"Ram %s: %.4g Gb",nomes_a_procurar[i].c_str(), browsers_ram[i] / 1048576);
+                browsers_ram[i] = 0;
+            //}
         }
         refresh();
         sleep(1);
