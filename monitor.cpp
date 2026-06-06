@@ -174,26 +174,33 @@ int main(){
         mvprintw(2,4,"Total     : %8.2f GB", storage.total);
         mvprintw(3,4,"Available : %8.2f GB              Press 'q' to leave", storage.available);
         mvprintw(4,4,"Used      : %8.2f GB", storage.used);
-        
+        mvaddch(5,4,'[');
+        int preenchimento = storage.used / storage.total * 50.0;
+        for (int i = 0; i < 50; i++) {
+            mvaddch(5,5+i, i < preenchimento ? '#' : ' ');
+        }
+        mvaddch(5,5+50,']');
 
-        mvprintw(6,2,"CPU");
+
+
+        mvprintw(7,2,"CPU");
         cpu current_cpu = cpu_usage();
         double cpu_percent = (current_cpu.work - last_cpu.work) * 100.0 / (current_cpu.total - last_cpu.total);
-        mvprintw(7,4,"CPU Usage: %6.2f%%", (cpu_percent));
-        mvaddch(8,4,'[');
-        int preenchimento = cpu_percent * 0.5;
+        mvprintw(8,4,"CPU Usage: %6.2f%%", (cpu_percent));
+        mvaddch(9,4,'[');
+        preenchimento = cpu_percent * 0.5;
         for (int i = 0; i < 50; i++) {
-            mvaddch(8,5+i, i < preenchimento ? '#' : ' ');
+            mvaddch(9,5+i, i < preenchimento ? '#' : ' ');
         }
-        mvaddch(8,5+50,']');
+        mvaddch(9,5+50,']');
 
 
-        mvprintw(10,2,"Browsers");
+        mvprintw(11,2,"Browsers");
         browsers_ram.resize(nomes_a_procurar.size());
         browser_search(nomes_a_procurar, browsers_ram, PIDS_Lixo, new_uptime, new_stime);
         for (unsigned short i = 0;i < nomes_a_procurar.size(); i++){
             //if (browsers_ram[i] > 10000){
-                mvprintw(11 + i,4,"%s       RAM: %.4g Gb      CPU: %.3g %%",nomes_a_procurar[i].c_str(), browsers_ram[i] / 1048576, ((new_uptime[i] - last_uptime[i]) + (new_stime[i] - last_stime[i])) * 100.0 / (current_cpu.total - last_cpu.total));
+                mvprintw(12 + i,4,"%-15s RAM: %7.2f Gb   CPU: %5.1f%%",nomes_a_procurar[i].c_str(), browsers_ram[i] / 1048576, ((new_uptime[i] - last_uptime[i]) + (new_stime[i] - last_stime[i])) * 100.0 / (current_cpu.total - last_cpu.total));
                 browsers_ram[i] = 0;
                 last_uptime[i] = new_uptime[i];
                 last_stime[i] = new_stime[i];
