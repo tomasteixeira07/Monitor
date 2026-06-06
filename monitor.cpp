@@ -7,7 +7,7 @@
 #include <vector>
 #include <unordered_set>
 #include <csignal>
-
+#include <sstream>
 
 
 using namespace std;
@@ -76,8 +76,7 @@ cpu cpu_usage(){
 }
  
 
-void browser_search(const vector<string>& nomes, vector <double> &storage, unordered_set<unsigned int> &PIDS_Lixo){
-    
+void browser_search(const vector<string>& nomes, vector <double> &storage, unordered_set<unsigned int> &PIDS_Lixo, vector<unsigned long int> &uptime, vector<unsigned long int> &stime){
     DIR* dir = opendir("/proc");
     struct dirent* entrada;
     while ((entrada = readdir(dir)) != NULL){
@@ -97,11 +96,20 @@ void browser_search(const vector<string>& nomes, vector <double> &storage, unord
                         getline(in2, line);
                         getline(in2, line);
                         storage[i] += extrair_dados_string_int(procurar_numeros(line));
+                        ifstream in3(entrada_str + "stat");
+                        getline(in3, line);
+                        istringstream iss(line);
+                        string totem;
+                        for (unsigned short i2 = 0; i2 < 13; i2++){iss >> totem;}
+                        uptime[i]+= extrair_dados_string_int(totem);
+                        iss >> totem;
+                        stime[i] += extrair_dados_string_int(totem);
                         // while (getline(in2, line)){
                         //     if (line.find("Pss:") != string::npos) {
                         //         total.ram[i] += extrair_dados_string_int(procurar_numeros(line));
                         //         break;}
                         // }
+
                         found = 1;
                         break;
                     }
@@ -150,12 +158,16 @@ int main(){
     box(stdscr, 0, 0);
     getmaxyx(stdscr, max_y, max_x);
     vector <double> browsers_ram(nomes_a_procurar.size());
+    vector <unsigned long int> new_uptime(nomes_a_procurar.size());
+    vector <unsigned long int> last_uptime(nomes_a_procurar.size());
+    vector <unsigned long int> new_stime(nomes_a_procurar.size());
+    vector <unsigned long int> last_stime(nomes_a_procurar.size());
     unordered_set <unsigned int> PIDS_Lixo;
     unsigned short contagem = 0;
     sleep(1);
     while (true){
         clear();
-
+    
 
         global_memory(storage);
         mvprintw(1,2,"Memory");
@@ -176,13 +188,17 @@ int main(){
         mvaddch(8,5+50,']');
 
 
-        mvprintw(10,2,"Memory Browsers");
+        mvprintw(10,2,"Browsers");
         browsers_ram.resize(nomes_a_procurar.size());
-        browser_search(nomes_a_procurar, browsers_ram, PIDS_Lixo);
+        browser_search(nomes_a_procurar, browsers_ram, PIDS_Lixo, new_uptime, new_stime);
         for (unsigned short i = 0;i < nomes_a_procurar.size(); i++){
             //if (browsers_ram[i] > 10000){
-                mvprintw(11 + i,4,"Ram %s: %.4g Gb",nomes_a_procurar[i].c_str(), browsers_ram[i] / 1048576);
+                mvprintw(11 + i,4,"%s       RAM: %.4g Gb      CPU: %.3g %%",nomes_a_procurar[i].c_str(), browsers_ram[i] / 1048576, ((new_uptime[i] - last_uptime[i]) + (new_stime[i] - last_stime[i])) * 100.0 / (current_cpu.total - last_cpu.total));
                 browsers_ram[i] = 0;
+                last_uptime[i] = new_uptime[i];
+                last_stime[i] = new_stime[i];
+                new_uptime[i] = 0;
+                new_stime[i] = 0;
             //}
         }
         refresh();
