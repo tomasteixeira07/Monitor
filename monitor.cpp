@@ -98,9 +98,13 @@ void browser_search(const vector<string>& nomes, vector <double> &storage, unord
                         storage[i] += extrair_dados_string_int(procurar_numeros(line));
                         ifstream in3(entrada_str + "stat");
                         getline(in3, line);
+                        line = line.substr(line.find(')') + 4);
+                        
                         istringstream iss(line);
                         string totem;
-                        for (unsigned short i2 = 0; i2 < 13; i2++){iss >> totem;}
+                        
+
+                        for (unsigned short i2 = 0; i2 < 11; i2++){iss >> totem;}
                         uptime[i]+= extrair_dados_string_int(totem);
                         iss >> totem;
                         stime[i] += extrair_dados_string_int(totem);
