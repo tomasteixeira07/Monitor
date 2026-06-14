@@ -133,7 +133,6 @@ void browser_search(const vector<string> &names, vector<double> &storage,
             //         total.ram[i] +=
             //         convert_str_int(search_int_in_str(line)); break;}
             // }
-
             found = 1;
             break;
           }
