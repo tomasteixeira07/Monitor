@@ -164,6 +164,7 @@ int main() {
     char x;
     printf("Number(press . to exit):");
     cin >> x;
+    cin.ignore();
     if (x == '.') {
       break;
     }
@@ -179,16 +180,19 @@ int main() {
   printf("Do you want to add a browser that is not in the list? (Y/N)");
   char x;
   cin >>x;
+  cin.ignore();
   while (x != 'N' and x != 'n'){
       if (x == 'Y' or x == 'y'){
           string new_browser;
           printf("Name of the new browser:");
           cin >> new_browser;
+          cin.ignore();
           nomes_a_procurar.push_back(new_browser);
       }
       else{printf("VALUE ERROR\nTry again");}
       printf("Do you want to add another? (Y/N)");
       cin >>x;
+      cin.ignore();
   }
 
 
