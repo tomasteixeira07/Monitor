@@ -201,13 +201,37 @@ int main() {
       cin.ignore();
   }
 
+  
+  //set precision cleaning the array of PIDS
+  printf(
+  "Each cycle, this program will add the numbers of processes that should not be counted.\n"
+  "If the system reuses a PID that is already in the trash list, it will not be counted again.\n"
+  "So, to improve precision, you can choose how often the trash process list is cleaned.\n"
+  "Chose the number of seconds (Default: 30 seconds):");
+  int count_pids;
+  bool not_valid;
+  do{
+      not_valid = 0;
+      string input; 
+      getline(cin, input);
+      if (input == ""){count_pids = 30;not_valid = 0;}
+      else{
+        for (char car : input){
+            if(not (car >= '0' and car <='9')){printf("INVALID VALUE!\nTry again:");not_valid = 1;break;}
+        }
+        if (not not_valid){
+            count_pids = convert_str_int(input);
+            if (count_pids == 0){printf("INVALID VALUE!\nTry again:");not_valid = 1;}
+        }
+      }
+  }
+  while(not_valid);
 
   
   initscr();
   nodelay(stdscr, TRUE);
   int max_y, max_x;
   box(stdscr, 0, 0);
-  cpu last_cpu = cpu_usage();
   getmaxyx(stdscr, max_y, max_x);
   box(stdscr, 0, 0);
   getmaxyx(stdscr, max_y, max_x);
@@ -218,7 +242,7 @@ int main() {
   vector<unsigned long int> last_stime(nomes_a_procurar.size());
   unordered_set<unsigned int> PIDS_Lixo;
   unsigned short count = 0;
-  sleep(1);
+  cpu last_cpu = cpu_usage();
   while (true) {
     clear();
     
@@ -273,7 +297,7 @@ int main() {
     sleep(1);
     last_cpu = current_cpu;
     count++;
-    if (count == 30) {
+    if (count == count_pids) {
       PIDS_Lixo.clear(), count = 0;
     };
   }
