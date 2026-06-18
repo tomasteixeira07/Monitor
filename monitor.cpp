@@ -6,7 +6,6 @@
 #include <sstream>
 #include <string>
 #include <unistd.h>
-#include <unordered_set>
 #include <vector>
 #include <algorithm>
 
@@ -89,21 +88,17 @@ cpu cpu_usage() {
 
 
 void browser_search(const vector<string> &names, vector<double> &storage,
-                    unordered_set<unsigned int> &pids_lixo,
                     vector<unsigned long int> &uptime,
                     vector<unsigned long int> &stime) {
   DIR *dir = opendir("/proc");
   struct dirent *entrada;
   while ((entrada = readdir(dir)) != NULL) {
     if (entrada->d_name[0] >= '0' and entrada->d_name[0] <= '9') {
-      string entrada_str = entrada->d_name;
-      unsigned long int PID = convert_str_int(entrada_str);
-      if (pids_lixo.find(PID) == pids_lixo.end()) {
+        string entrada_str = entrada->d_name;
         entrada_str = "/proc/" + entrada_str + '/';
         ifstream in(entrada_str + "cgroup");
         string line;
         getline(in, line);
-        bool found = 0;
         for (unsigned short i = 0; i < names.size(); i++) {
           if (line.find(names[i]) != string::npos) {
             ifstream in2(entrada_str + "smaps_rollup");
@@ -129,13 +124,8 @@ void browser_search(const vector<string> &names, vector<double> &storage,
             //         total.ram[i] +=
             //         convert_str_int(search_int_in_str(line)); break;}
             // }
-            found = 1;
             break;
           }
-        }
-        if (found == 0) {
-          pids_lixo.insert(PID);
-        }
       }
     }
   }
@@ -198,46 +188,14 @@ int main() {
   }
 
   
-  //set precision cleaning the array of PIDS
-  printf(
-  "Each cycle, this program will add the numbers of processes that should not be counted.\n"
-  "If the system reuses a PID that is already in the trash list, it will not be counted again.\n"
-  "So, to improve precision, you can choose how often the trash process list is cleaned.\n"
-  "Chose the number of seconds (Default: 30 seconds):");
-  int count_pids;
-  bool not_valid;
-  do{
-      not_valid = 0;
-      string input; 
-      getline(cin, input);
-      if (input == ""){count_pids = 30;not_valid = 0;}
-      else{
-        for (char car : input){
-            if(not (car >= '0' and car <='9')){printf("INVALID VALUE!\nTry again:");not_valid = 1;break;}
-        }
-        if (not not_valid){
-            count_pids = convert_str_int(input);
-            if (count_pids == 0){printf("INVALID VALUE!\nTry again:");not_valid = 1;}
-        }
-      }
-  }
-  while(not_valid);
-
-  
   initscr();
   nodelay(stdscr, TRUE);
-  int max_y, max_x;
   box(stdscr, 0, 0);
-  getmaxyx(stdscr, max_y, max_x);
-  box(stdscr, 0, 0);
-  getmaxyx(stdscr, max_y, max_x);
   vector<double> browsers_ram(nomes_a_procurar.size());
   vector<unsigned long int> new_uptime(nomes_a_procurar.size());
   vector<unsigned long int> last_uptime(nomes_a_procurar.size());
   vector<unsigned long int> new_stime(nomes_a_procurar.size());
   vector<unsigned long int> last_stime(nomes_a_procurar.size());
-  unordered_set<unsigned int> pids_lixo;
-  unsigned short count = 0;
   cpu last_cpu = cpu_usage();
   while (true) {
     clear();
@@ -267,7 +225,7 @@ int main() {
     //print Browsers
     mvprintw(11, 2, "Browsers");
     browsers_ram.resize(nomes_a_procurar.size());
-    browser_search(nomes_a_procurar, browsers_ram, pids_lixo, new_uptime,new_stime);
+    browser_search(nomes_a_procurar, browsers_ram, new_uptime,new_stime);
     for (unsigned short i = 0; i < nomes_a_procurar.size(); i++) {
         mvprintw(12 + i, 4, "%-15s RAM: %7.2f Gb   CPU: %5.1f%%",
                     nomes_a_procurar[i].c_str(), browsers_ram[i] / 1048576,
@@ -280,6 +238,7 @@ int main() {
       new_stime[i] = 0;
     }
 
+    
     //search if the user wants to leave
     refresh();
     int ch = getch();
@@ -289,12 +248,7 @@ int main() {
     }
 
 
-    
     sleep(1);
     last_cpu = current_cpu;
-    count++;
-    if (count == count_pids) {
-      pids_lixo.clear(), count = 0;
-    };
   }
 }

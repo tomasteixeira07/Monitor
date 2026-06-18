@@ -8,9 +8,8 @@ A lightweight Linux system resource monitor for tracking browser memory and CPU 
 - CPU usage monitoring with a visual bar
 - Track multiple browsers simultaneously (Firefox, Chrome, Brave, etc.)
 - Add custom browsers not in the default list
-- Lightweight (~4.7 MB RAM)
+- Lightweight (~4.6 MB RAM)
 - CPU: ~7% of one core
-- Configurable precision (PIDs cleanup interval)
 
 ## Installation
 
@@ -37,13 +36,7 @@ sudo apt install libncurses-dev g++
 ./monitor
 ```
 
-Select browsers to monitor (0-7), press '.' to exit. Optionally add custom ones. Set precision interval, then press 'q' to exit.
-
-## Performance
-
-- RAM: ~4.7 MB
-- CPU: <5% (varies with system load)
-- I/O: Minimal (only reads `/proc`)
+Select browsers to monitor (0-7), press '.' to exit. Optionally add custom ones. Then press 'q' to exit.
 
 ## Building
 
