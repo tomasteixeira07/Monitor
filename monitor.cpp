@@ -252,4 +252,3 @@ int main() {
     last_cpu = current_cpu;
   }
 }
-
