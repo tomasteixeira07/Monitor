@@ -44,7 +44,3 @@ Select browsers to monitor (0-7), press '.' to exit. Optionally add custom ones.
 make          # Compile with optimizations
 make clean    # Remove binary
 ```
-
-## License
-
-MIT License
