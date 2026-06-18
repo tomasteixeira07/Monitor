@@ -96,7 +96,7 @@ void browser_search(const vector<string> &names, vector<double> &storage,
     if (entrada->d_name[0] >= '0' and entrada->d_name[0] <= '9') {
         string entrada_str = entrada->d_name;
         entrada_str = "/proc/" + entrada_str + '/';
-        ifstream in(entrada_str + "cgroup");
+        ifstream in(entrada_str + "cmdline");
         string line;
         getline(in, line);
         for (unsigned short i = 0; i < names.size(); i++) {
