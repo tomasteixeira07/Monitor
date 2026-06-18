@@ -8,14 +8,9 @@ all: $(TARGET)
 
 $(TARGET): $(SRC)
 	$(CXX) $(CXXFLAGS) $(SRC) -o $(TARGET) $(LDFLAGS)
+	strip -s $(TARGET)
 
 clean:
-	rm -f $(TARGET) *.o
+	rm -f $(TARGET)
 
-install: $(TARGET)
-	install -D $(TARGET) /usr/local/bin/$(TARGET)
-
-uninstall:
-	rm -f /usr/local/bin/$(TARGET)
-
-.PHONY: all clean install uninstall
+.PHONY: all clean

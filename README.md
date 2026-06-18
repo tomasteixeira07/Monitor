@@ -8,7 +8,7 @@ A lightweight Linux system resource monitor for tracking browser memory and CPU 
 - CPU usage monitoring with a visual bar
 - Track multiple browsers simultaneously (Firefox, Chrome, Brave, etc.)
 - Add custom browsers not in the default list
-- Lightweight (~4.6 MB RAM)
+- Lightweight (~4.4 MB RAM)
 - CPU: ~7% of one core
 
 ## Installation
