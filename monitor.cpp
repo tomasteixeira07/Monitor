@@ -144,10 +144,10 @@ int main() {
 
   
   //Choose whish browsers you want to analyze
-  const string names[8] = {"firefox", "chrome", "chromium",  "brave", "vivaldi", "edge", "librewolf", "zen"};
+  const string names[] = {"firefox", "chrome", "chromium", "brave"};
   vector<unsigned short> names_to_use;
   printf("Browsers disponiveis:\n");
-  for (unsigned short i = 0; i < 8; i++) {
+  for (unsigned short i = 0; i < 4; i++) {
     printf("%d. %s\n", i, names[i].c_str());
   }
   printf("Press the numbers of the browsers you want to add:\n");

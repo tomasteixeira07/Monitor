@@ -36,7 +36,7 @@ sudo apt install libncurses-dev g++
 ./monitor
 ```
 
-Select browsers to monitor (0-7), press '.' to exit. Optionally add custom ones. Then press 'q' to exit.
+Select browsers to monitor (0-3), press '.' to exit. Optionally add custom ones. Then press 'q' to exit.
 
 ## Building
 
