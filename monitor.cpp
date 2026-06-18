@@ -1,7 +1,3 @@
-//TODO: Permitir ao user adicionar o browser que quer
-// melhorar a escolha de browsers, será que caixinhas é possivel?
-
-
 #include <cstdio>
 #include <dirent.h>
 #include <fstream>
@@ -93,7 +89,7 @@ cpu cpu_usage() {
 
 
 void browser_search(const vector<string> &names, vector<double> &storage,
-                    unordered_set<unsigned int> &PIDS_Lixo,
+                    unordered_set<unsigned int> &pids_lixo,
                     vector<unsigned long int> &uptime,
                     vector<unsigned long int> &stime) {
   DIR *dir = opendir("/proc");
@@ -102,7 +98,7 @@ void browser_search(const vector<string> &names, vector<double> &storage,
     if (entrada->d_name[0] >= '0' and entrada->d_name[0] <= '9') {
       string entrada_str = entrada->d_name;
       unsigned long int PID = convert_str_int(entrada_str);
-      if (PIDS_Lixo.find(PID) == PIDS_Lixo.end()) {
+      if (pids_lixo.find(PID) == pids_lixo.end()) {
         entrada_str = "/proc/" + entrada_str + '/';
         ifstream in(entrada_str + "cgroup");
         string line;
@@ -138,7 +134,7 @@ void browser_search(const vector<string> &names, vector<double> &storage,
           }
         }
         if (found == 0) {
-          PIDS_Lixo.insert(PID);
+          pids_lixo.insert(PID);
         }
       }
     }
@@ -240,7 +236,7 @@ int main() {
   vector<unsigned long int> last_uptime(nomes_a_procurar.size());
   vector<unsigned long int> new_stime(nomes_a_procurar.size());
   vector<unsigned long int> last_stime(nomes_a_procurar.size());
-  unordered_set<unsigned int> PIDS_Lixo;
+  unordered_set<unsigned int> pids_lixo;
   unsigned short count = 0;
   cpu last_cpu = cpu_usage();
   while (true) {
@@ -271,7 +267,7 @@ int main() {
     //print Browsers
     mvprintw(11, 2, "Browsers");
     browsers_ram.resize(nomes_a_procurar.size());
-    browser_search(nomes_a_procurar, browsers_ram, PIDS_Lixo, new_uptime,new_stime);
+    browser_search(nomes_a_procurar, browsers_ram, pids_lixo, new_uptime,new_stime);
     for (unsigned short i = 0; i < nomes_a_procurar.size(); i++) {
         mvprintw(12 + i, 4, "%-15s RAM: %7.2f Gb   CPU: %5.1f%%",
                     nomes_a_procurar[i].c_str(), browsers_ram[i] / 1048576,
@@ -298,7 +294,7 @@ int main() {
     last_cpu = current_cpu;
     count++;
     if (count == count_pids) {
-      PIDS_Lixo.clear(), count = 0;
+      pids_lixo.clear(), count = 0;
     };
   }
 }
