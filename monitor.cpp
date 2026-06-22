@@ -199,35 +199,37 @@ int main() {
   cpu last_cpu = cpu_usage();
   while (true) {
     clear();
-    
+    unsigned short contage_linhas = 1;
     //print memory
     global_memory(storage);
-    mvprintw(1, 2, "Memory");
-    mvprintw(2, 4, "Total     : %8.2f GB", storage.total);
-    mvprintw(3, 4, "Available : %8.2f GB              Press 'q' to leave", storage.available);
-    mvprintw(4, 4, "Used      : %8.2f GB", storage.used);
-    mvaddch(5, 4, '[');
+    mvprintw(contage_linhas++, 2, "Memory");
+    mvprintw(contage_linhas++, 4, "Total     : %8.2f GB", storage.total);
+    mvprintw(contage_linhas++, 4, "Available : %8.2f GB              Press 'q' to leave", storage.available);
+    mvprintw(contage_linhas, 4, "Used      : %8.2f GB", storage.used);
+    contage_linhas += 2;
+    mvprintw(contage_linhas++, 4, "RAM Usage:%6.2f%%",storage.used / storage.total * 100.0);
+    mvaddch(contage_linhas, 4, '[');
     int preenchimento = storage.used / storage.total * 50.0;
-    for (int i = 0; i < 50; i++) {mvaddch(5, 5 + i, i < preenchimento ? '#' : ' ');}
-    mvaddch(5, 5 + 50, ']');
-
+    for (int i = 0; i < 50; i++) {mvaddch(contage_linhas, 5 + i, i < preenchimento ? '#' : ' ');}
+    mvaddch(contage_linhas, 5 + 50, ']');
+    contage_linhas += 2;
     //print CPU 
-    mvprintw(7, 2, "CPU");
+    mvprintw(contage_linhas++, 2, "CPU");
     cpu current_cpu = cpu_usage();
     double cpu_percent = (current_cpu.work - last_cpu.work) * 100.0 /
                          (current_cpu.total - last_cpu.total);
-    mvprintw(8, 4, "CPU Usage: %6.2f%%", (cpu_percent));
-    mvaddch(9, 4, '[');
+    mvprintw(contage_linhas++, 4, "CPU Usage: %6.2f%%", (cpu_percent));
+    mvaddch(contage_linhas, 4, '[');
     preenchimento = cpu_percent * 0.5;
-    for (int i = 0; i < 50; i++) {mvaddch(9, 5 + i, i < preenchimento ? '#' : ' ');}
-    mvaddch(9, 5 + 50, ']');
-
+    for (int i = 0; i < 50; i++) {mvaddch(contage_linhas, 5 + i, i < preenchimento ? '#' : ' ');}
+    mvaddch(contage_linhas, 5 + 50, ']');
+    contage_linhas+=2;
     //print Browsers
-    mvprintw(11, 2, "Browsers");
+    mvprintw(contage_linhas++, 2, "Browsers");
     browsers_ram.resize(nomes_a_procurar.size());
     browser_search(nomes_a_procurar, browsers_ram, new_uptime,new_stime);
     for (unsigned short i = 0; i < nomes_a_procurar.size(); i++) {
-        mvprintw(12 + i, 4, "%-15s RAM: %7.2f Gb   CPU: %5.1f%%",
+        mvprintw(contage_linhas++, 4, "%-15s RAM: %7.2f Gb   CPU: %5.1f%%",
                     nomes_a_procurar[i].c_str(), browsers_ram[i] / 1048576,
                     ((new_uptime[i] - last_uptime[i]) + (new_stime[i] - last_stime[i])) *
                     100.0 / (current_cpu.total - last_cpu.total));
