@@ -142,15 +142,16 @@ int main() {
   in.close();
   line.clear();
 
+  printf("\n\n=====================<Monitor>====================\n\n\n");
   
   //Choose whish browsers you want to analyze
   const string names[] = {"firefox", "chrome", "chromium", "brave"};
   vector<unsigned short> names_to_use;
   printf("Browsers disponiveis:\n");
   for (unsigned short i = 0; i < 4; i++) {
-    printf("%d. %s\n", i, names[i].c_str());
+    printf("   %d. %s\n", i, names[i].c_str());
   }
-  printf("Press the numbers of the browsers you want to add:\n");
+  printf("Press the numbers of the browsers you want to add:\n\n");
   vector<string> nomes_a_procurar;
   while (true) {
     char x;
@@ -169,7 +170,7 @@ int main() {
   }
 
   //add browsers whish are not in the list
-  printf("Do you want to add a browser that is not in the list? (Y/N)");
+  printf("\nDo you want to add a browser that is not in the list? (Y/N)");
   char x;
   cin >>x;
   cin.ignore();
