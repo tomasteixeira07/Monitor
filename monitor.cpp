@@ -187,6 +187,16 @@ int main() {
       cin.ignore();
   }
 
+  vector<string> nomes_a_procurar_titulo;
+  for (const string &str: nomes_a_procurar){
+      string new_str = "";
+      for (unsigned long int i = 0; i < str.length(); i++){
+          if (i == 0){new_str.push_back(str[i] - 'a' + 'A');}
+          else{new_str.push_back(str[i]);}
+      }
+      nomes_a_procurar_titulo.push_back(new_str);
+  }
+
   
   initscr();
   nodelay(stdscr, TRUE);
@@ -230,7 +240,7 @@ int main() {
     browser_search(nomes_a_procurar, browsers_ram, new_uptime,new_stime);
     for (unsigned short i = 0; i < nomes_a_procurar.size(); i++) {
         mvprintw(contage_linhas++, 4, "%-15s RAM: %7.2f Gb   CPU: %5.1f%%",
-                    nomes_a_procurar[i].c_str(), browsers_ram[i] / 1048576,
+                    nomes_a_procurar_titulo[i].c_str(), browsers_ram[i] / 1048576,
                     ((new_uptime[i] - last_uptime[i]) + (new_stime[i] - last_stime[i])) *
                     100.0 / (current_cpu.total - last_cpu.total));
       browsers_ram[i] = 0;
