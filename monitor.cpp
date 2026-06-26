@@ -142,7 +142,7 @@ int main() {
   in.close();
   line.clear();
 
-  printf("\n\n=====================<Monitor>====================\n\n\n");
+  printf("\n=====================<Monitor>====================\n\n");
   
   //Choose whish browsers you want to analyze
   const string names[] = {"firefox", "chrome", "chromium", "brave"};
@@ -161,7 +161,7 @@ int main() {
     if (x == '.') {
       break;
     }
-    if (x < '0' or x > '7') {
+    if (x < '0' or x > '3') {
       printf("ERROR! INVALID VALUE\n");
     } else {
         if(find(names_to_use.begin(), names_to_use.end(), x - 48) != names_to_use.end()){printf("ERROR! ALREADY ADDED! TRY AGAIN\n");}
